@@ -4,31 +4,35 @@ import csv
 import re
 import io
 
-# Function to process the data from the uploaded file
-def process_email_file(uploaded_file):
-    # Read the file
-    lines = uploaded_file.getvalue().decode("utf-8").splitlines()
+# Function to process the pasted data
+def process_email_data(pasted_data):
+    # Split the content into blocks separated by "-------------" or "============="
+    data_blocks = re.split(r'[-=]{10,}', pasted_data)
 
-    # Process the data
+    # Initialize the processed data
     processed_data = [["First Name", "Last Name", "Email"]]  # Header row
-    for line in lines:
-        # Use regular expression to extract the email
-        email_match = re.search(r'\S+@\S+', line)  # Match email format
-        if email_match:
-            email = email_match.group(0)  # Extract email
-            # Remove email from line to isolate the name
-            name = line.replace(email, '').strip()
-            # Separate the name into parts
-            name_parts = name.split()
-            if len(name_parts) > 1:
-                first_name = name_parts[0]
-                last_name = " ".join(name_parts[1:])  # Join the rest as last name
-            else:
-                first_name = name_parts[0]
-                last_name = ""  # No last name found
-            processed_data.append([first_name, last_name, email])
 
-    # Convert the processed data to CSV in memory
+    # Process each block of data
+    for block in data_blocks:
+        lines = block.strip().split("\n")
+        for line in lines:
+            # Use regular expression to extract the email
+            email_match = re.search(r'\S+@\S+', line)  # Match email format
+            if email_match:
+                email = email_match.group(0)  # Extract email
+                # Remove email from line to isolate the name
+                name = line.replace(email, '').strip()
+                # Separate the name into parts
+                name_parts = name.split()
+                if len(name_parts) > 1:
+                    first_name = name_parts[0]
+                    last_name = " ".join(name_parts[1:])  # Join the rest as last name
+                else:
+                    first_name = name_parts[0]
+                    last_name = ""  # No last name found
+                processed_data.append([first_name, last_name, email])
+
+    # Convert the data to a CSV in memory using BytesIO for binary output
     output_file = io.BytesIO()
     writer = csv.writer(output_file)
     writer.writerows(processed_data)
@@ -37,14 +41,22 @@ def process_email_file(uploaded_file):
     return output_file
 
 # Streamlit UI
-st.title(" Full Name and Email Address followed by dashlines ------")
+st.title("Email and Name Processor")
 
-# File uploader for the user to upload the file
-uploaded_file = st.file_uploader("Upload your text file", type=["txt"])
+# Text area for pasting the dataset
+pasted_data = st.text_area("Paste your text data here", height=300)
 
-if uploaded_file is not None:
-    # Process the uploaded file
-    output_file = process_email_file(uploaded_file)
+# Buttons to process and clear data
+if st.button("Extract Data"):
+    if pasted_data.strip():
+        # Process the pasted data
+        output_file = process_email_data(pasted_data)
 
-    # Provide download button for the CSV file
-    st.download_button("Download Processed CSV", output_file, file_name="Names_Separated.csv", mime="text/csv")
+        # Provide download link for the CSV file
+        st.download_button("Download Processed CSV", output_file, file_name="Names_Separated.csv", mime="text/csv")
+    else:
+        st.warning("Please paste some data to extract.")
+
+# Clear the pasted data
+if st.button("Clear Data"):
+    st.text_area("Paste your text data here", height=300, value="")
