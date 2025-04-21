@@ -1,6 +1,5 @@
 import pandas as pd
 import streamlit as st
-import csv
 import re
 import io
 
@@ -25,11 +24,11 @@ def process_email_data(pasted_data):
                 # Separate the name into parts
                 name_parts = name.split()
                 if len(name_parts) > 1:
-                    first_name = name_parts[0]
-                    last_name = " ".join(name_parts[1:])  # Join the rest as last name
+                    first_name = name_parts[0].capitalize()
+                    last_name = " ".join([part.capitalize() for part in name_parts[1:]])
                 else:
-                    first_name = name_parts[0]
-                    last_name = ""  # No last name found
+                    first_name = name_parts[0].capitalize()
+                    last_name = ""
                 processed_data.append([first_name, last_name, email])
 
     return processed_data
@@ -45,21 +44,21 @@ if st.button("Extract Data"):
     if pasted_data.strip():
         # Process the pasted data
         processed_data = process_email_data(pasted_data)
-        
+
         # Display the data in a table
         st.subheader("Processed Data")
         df = pd.DataFrame(processed_data[1:], columns=processed_data[0])
         st.dataframe(df)
-        
-        # Show CSV content for manual copy-paste
-        st.subheader("Copy to Clipboard (Paste into Excel)")
-        csv_text = df.to_csv(index=False, sep='\t')
-        st.code(csv_text, language='csv')
-        
+
+        # Show TSV content for easy Excel copy-paste
+        st.subheader("Copy to Clipboard (Paste into Excel or Sheets)")
+        tsv_text = df.to_csv(index=False, sep='\t')
+        st.code(tsv_text, language='text')
+
         # Convert to CSV for download
         output_file = io.BytesIO()
         df.to_csv(output_file, index=False)
-        output_file.seek(0)  # Rewind the buffer to the beginning
+        output_file.seek(0)
 
         # Provide download link for the CSV file
         st.download_button("Download Processed CSV", output_file, file_name="Names_Separated.csv", mime="text/csv")
