@@ -51,6 +51,11 @@ if st.button("Extract Data"):
         df = pd.DataFrame(processed_data[1:], columns=processed_data[0])
         st.dataframe(df)
         
+        # Show CSV content for manual copy-paste
+        st.subheader("Copy to Clipboard (Paste into Excel)")
+        csv_text = df.to_csv(index=False)
+        st.code(csv_text, language='csv')
+        
         # Convert to CSV for download
         output_file = io.BytesIO()
         df.to_csv(output_file, index=False)
