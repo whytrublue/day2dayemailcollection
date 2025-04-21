@@ -32,13 +32,7 @@ def process_email_data(pasted_data):
                     last_name = ""  # No last name found
                 processed_data.append([first_name, last_name, email])
 
-    # Convert the data to a CSV in memory using BytesIO for binary output
-    output_file = io.BytesIO()
-    writer = csv.writer(output_file)
-    writer.writerows(processed_data)
-    output_file.seek(0)  # Rewind the buffer to the beginning
-
-    return output_file
+    return processed_data
 
 # Streamlit UI
 st.title("Email and Name Processor")
@@ -50,7 +44,17 @@ pasted_data = st.text_area("Paste your text data here", height=300)
 if st.button("Extract Data"):
     if pasted_data.strip():
         # Process the pasted data
-        output_file = process_email_data(pasted_data)
+        processed_data = process_email_data(pasted_data)
+        
+        # Display the data in a table
+        st.subheader("Processed Data")
+        df = pd.DataFrame(processed_data[1:], columns=processed_data[0])
+        st.dataframe(df)
+        
+        # Convert to CSV for download
+        output_file = io.BytesIO()
+        df.to_csv(output_file, index=False)
+        output_file.seek(0)  # Rewind the buffer to the beginning
 
         # Provide download link for the CSV file
         st.download_button("Download Processed CSV", output_file, file_name="Names_Separated.csv", mime="text/csv")
@@ -59,4 +63,4 @@ if st.button("Extract Data"):
 
 # Clear the pasted data
 if st.button("Clear Data"):
-    st.text_area("Paste your text data here", height=300, value="")
+    st.experimental_rerun()
