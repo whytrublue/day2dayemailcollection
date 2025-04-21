@@ -36,6 +36,9 @@ def process_email_data(pasted_data):
 # Streamlit UI
 st.title("Email and Name Processor")
 
+# Example text under the input area
+st.markdown("**Example:** `babu reddy babu@gmail.com`")
+
 # Text area for pasting the dataset
 pasted_data = st.text_area("Paste your text data here", height=300)
 
@@ -45,22 +48,21 @@ if st.button("Extract Data"):
         # Process the pasted data
         processed_data = process_email_data(pasted_data)
 
-        # Display the data in a table
-        st.subheader("Processed Data")
+        # Create DataFrame
         df = pd.DataFrame(processed_data[1:], columns=processed_data[0])
         st.dataframe(df)
 
-        # Show TSV content for easy Excel copy-paste
+        # Show TSV content for copy-paste into Excel
         st.subheader("Copy to Clipboard (Paste into Excel or Sheets)")
         tsv_text = df.to_csv(index=False, sep='\t')
         st.code(tsv_text, language='text')
 
-        # Convert to CSV for download
+        # Prepare CSV download
         output_file = io.BytesIO()
         df.to_csv(output_file, index=False)
         output_file.seek(0)
 
-        # Provide download link for the CSV file
+        # Download button
         st.download_button("Download Processed CSV", output_file, file_name="Names_Separated.csv", mime="text/csv")
     else:
         st.warning("Please paste some data to extract.")
