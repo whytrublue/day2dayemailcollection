@@ -32,11 +32,11 @@ def process_email_data(pasted_data):
                     last_name = ""  # No last name found
                 processed_data.append([first_name, last_name, email])
 
-    # Save the data to a CSV file in memory
-    output_file = io.StringIO()
-    writer = csv.writer(output_file)
+    # Convert the data to a CSV in memory
+    output_file = io.BytesIO()  # Use BytesIO instead of StringIO
+    writer = csv.writer(io.TextIOWrapper(output_file, 'w', newline='', encoding='utf-8'))
     writer.writerows(processed_data)
-    output_file.seek(0)
+    output_file.seek(0)  # Rewind the buffer to the beginning
 
     return output_file
 
