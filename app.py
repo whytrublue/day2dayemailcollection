@@ -53,7 +53,7 @@ if st.button("Extract Data"):
         
         # Show CSV content for manual copy-paste
         st.subheader("Copy to Clipboard (Paste into Excel)")
-        csv_text = df.to_csv(index=False)
+        csv_text = df.to_csv(index=False, sep='\t')
         st.code(csv_text, language='csv')
         
         # Convert to CSV for download
