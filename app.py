@@ -35,8 +35,6 @@ def process_email_data(pasted_data):
 
 # Streamlit UI
 st.title("Email and Name Processor")
-
-# Example text under the input area
 st.markdown("**Example:** `babu reddy babu@gmail.com`")
 
 # Text area for pasting the dataset
@@ -50,9 +48,8 @@ if st.button("Extract Data"):
 
         # Create DataFrame
         df = pd.DataFrame(processed_data[1:], columns=processed_data[0])
-        st.dataframe(df)
 
-        # Show TSV content for copy-paste into Excel
+        # Show TSV for clipboard copy
         st.subheader("Copy to Clipboard (Paste into Excel or Sheets)")
         tsv_text = df.to_csv(index=False, sep='\t')
         st.code(tsv_text, language='text')
