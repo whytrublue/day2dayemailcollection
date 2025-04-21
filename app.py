@@ -34,7 +34,7 @@ def process_email_data(pasted_data):
 
     # Convert the data to a CSV in memory using BytesIO for binary output
     output_file = io.BytesIO()
-    writer = csv.writer(io.TextIOWrapper(output_file, mode='w', newline='', encoding='utf-8'))
+    writer = csv.writer(output_file)
     writer.writerows(processed_data)
     output_file.seek(0)  # Rewind the buffer to the beginning
 
